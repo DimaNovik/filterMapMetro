@@ -204,7 +204,8 @@ button:focus {
 ---- */
 
 .listStation {
-	height: 400px;
+	min-height: 400px; 
+	max-height: 550px;
 	overflow: auto;
 	list-style-type: none;
 	padding-left: 0;
@@ -226,9 +227,17 @@ button:focus {
 	margin-top: 5px;
 
 }
-
 .clearStation {
 	font-size: 16px;
 	float: right;
+	margin-right: 20px;
+	cursor: pointer;
+}
+
+.clearAll {
+	display: none;
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	color: blue;
 	cursor: pointer;
 }

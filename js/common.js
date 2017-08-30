@@ -24,7 +24,11 @@ window.onclick = function(event) {
 // Checked line to red from Select
 let lineArea = document.querySelector('#scheme-layer-labels'),
 	lines = lineArea.childNodes,
-	selectedLineArray = [];
+	clickedLineArrayShowed = [],
+	clickedLineArray = [],
+	elClose = [],
+	clearAll =  document.querySelector('.clearAll');
+
 	
 
 	for(let i=0; i<lines.length; i++) {
@@ -38,19 +42,49 @@ let lineArea = document.querySelector('#scheme-layer-labels'),
 					eventLineNumber = event.path[1].attributes[1].value;
 
 				lineClick.classList.add("selected");
+
 				eventLineId = eventLineId.split('-');
+
 				clickedLineObject.id = eventLineId[1];
 				clickedLineObject.name = eventLineName;
 				clickedLineObject.line = eventLineNumber;
-				// selectedLineArray[i] = selectedLineArray.push(eventLineName);
-				selectedLineArray.push(clickedLineObject);
+
+				for(let i=0;i<clickedLineArray.length; i++) {
+					if(clickedLineObject.id == clickedLineArray[i]['id']) {
+						return false;
+					}
+					
+				}
+				clickedLineArray.push(clickedLineObject);
+				//console.log(clickedLineArray);
+
+
+
+				function uniqueVal(value, index, self) { 
+    				return self.indexOf(value) === index;
+				}
+				clickedLineArray.filter( uniqueVal); // ["кришна", "харе", "8-()"]
+			
+				clickedLineArrayShowed = clickedLineArray;
+
+				// функция для сортировки в прямом порядке (по возрастанию)
+				function compareObjects (a, b) {
+  				if (a.line > b.line) return 1;
+  				if (a.line < b.line) return -1;
+  				return 0;
+				};		
+				clickedLineArrayShowed.sort(compareObjects);
+				
+				
+		
 				// add selected station in ul list
 				document.getElementById("listStation").innerHTML = "";
-				for (let i = 0; i < selectedLineArray.length; i++)
+				elClose = [];
+				for (let i = 0; i < clickedLineArrayShowed.length; i++)
 			  	{
 			  		// checked line number to create background color for li
 			  		let colorLine = "";
-			  		switch(selectedLineArray[i]['line']) {
+			  		switch(clickedLineArray[i]['line']) {
 			  			case "1": 
 			  				colorLine = "rgb(239, 30, 37)";
 			  				break;
@@ -69,13 +103,40 @@ let lineArea = document.querySelector('#scheme-layer-labels'),
 
 			  		} 
 			       	nameList = "<li><span class='iconStation' style='background-color:"+colorLine+"'></span>" 
-			       				+ selectedLineArray[i]['name'] + "<span class='clearStation'>&times;</span></li>";
+			       				+ clickedLineArrayShowed[i]['name'] + "<span class='clearStation' data-stationId='"+clickedLineArrayShowed[i]['id'] +"'>&times;</span></li>";
 			       	document.getElementById("listStation").innerHTML += nameList;
-			  	}				
-			})
-			selectedLineArray = selectedLineArray;
+			       	
+			       	if(nameList) {
+			       		clearAll.style.display = "block";
+			       	}
+
+			        elClose.push(document.querySelector("span[data-stationId='"+clickedLineArrayShowed[i]['id'] +"']"));
+					
+				
+					
+					
+			  	}	
+
+			  	for(i=0; i<elClose.length; i++) {
+
+			  		elClose[i].addEventListener('click', function(event) {
+			  			
+			  		})
+			  	
+			  	}	
+
+
+						 	
+			});
+
 		}
+
+
 	}
+
+
+
+
 
 // When select name line color to red all label
 
@@ -85,32 +146,52 @@ let select = document.querySelector('#line-name'),
 select.addEventListener('change', function(event) {
 	let selectedNumberLine = event.target.value,
 		selectedNameLine = event.target.selectedOptions["0"].text;
-	selectedLineObject.id = "";
-	selectedLineObject.name = selectedNameLine;
-	selectedLineObject.line = selectedNumberLine;
-	
-	selectedLineArray.push(selectedLineObject);
-	console.log(selectedLineArray);
-	selectedLineArray = selectedLineArray;
+
 
 	for(let i=0; i<lines.length; i++) {
 		if(i % 2) {
 			let numberLine = lines[i].getAttribute("data-line");
 			if (selectedNumberLine === numberLine) {
 				lines[i].classList.add("selected");
+				selectedLineObject.id = "";
+				selectedLineObject.name = selectedNameLine;
+				selectedLineObject.line = selectedNumberLine;
+	
+				clickedLineArray.push(selectedLineObject);
+			
+			
 			}
 		}
 	}
-	for (let k = 0; k < selectedLineArray.length; k++) {
-		if (!selectedLineArray[k].id) {
+	for (let k = 0; k < selectedLineArrayShowed.length; k++) {
+		if (!selectedLineArrayShowed[k].id) {
 			nameList = "<li><span class='iconStation'></span>" 
-			       	+ selectedLineArray[k]['name'] + "<span class='clearStation'>&times;</span></li>";
+			       	+ selectedLineArrayShowed[k]['name'] + "<span class='clearStation'>&times;</span></li>";
 			document.getElementById("listStation").innerHTML += nameList;
 		}
 		
 	}
-	selectedLineArray = selectedLineArray;
+	//selectedLineArray = selectedLineArray;
+
 })
 
+// Event for clear all array station
+clearAll.addEventListener('click', function() {
+	let lineArea = document.querySelector('#scheme-layer-labels');
+	lines = lineArea.childNodes;
+
+	for(let i=0; i<lines.length; i++) {
+		if(i%2) {
+			lines[i].removeAttribute("class");
+		}
+		
+	}
+	clickedLineArray = [];
+	clickedLineArrayShowed = [];
+	document.getElementById("listStation").innerHTML = "";
+
+})
+
+console.log(clickedLineArray);
 
 
