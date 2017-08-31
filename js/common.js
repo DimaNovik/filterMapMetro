@@ -29,7 +29,6 @@ let lineArea = document.querySelector('#scheme-layer-labels'),
 	elClose = [],
 	clearAll =  document.querySelector('.clearAll');
 
-	
 
 	for(let i=0; i<lines.length; i++) {
 		if(i % 2) {
@@ -45,6 +44,10 @@ let lineArea = document.querySelector('#scheme-layer-labels'),
 
 				eventLineId = eventLineId.split('-');
 
+				if(!eventLineName) {
+					return false;
+				}
+
 				clickedLineObject.id = eventLineId[1];
 				clickedLineObject.name = eventLineName;
 				clickedLineObject.line = eventLineNumber;
@@ -52,18 +55,19 @@ let lineArea = document.querySelector('#scheme-layer-labels'),
 				for(let i=0;i<clickedLineArray.length; i++) {
 					if(clickedLineObject.id == clickedLineArray[i]['id']) {
 						return false;
-					}
-					
+					}					
 				}
+			
 				clickedLineArray.push(clickedLineObject);
+				
 				//console.log(clickedLineArray);
 
 
-
+				// function for insert unique data for array
 				function uniqueVal(value, index, self) { 
     				return self.indexOf(value) === index;
 				}
-				clickedLineArray.filter( uniqueVal); // ["кришна", "харе", "8-()"]
+				clickedLineArray.filter( uniqueVal);
 			
 				clickedLineArrayShowed = clickedLineArray;
 
@@ -79,7 +83,7 @@ let lineArea = document.querySelector('#scheme-layer-labels'),
 		
 				// add selected station in ul list
 				document.getElementById("listStation").innerHTML = "";
-				elClose = [];
+				
 				for (let i = 0; i < clickedLineArrayShowed.length; i++)
 			  	{
 			  		// checked line number to create background color for li
@@ -102,77 +106,133 @@ let lineArea = document.querySelector('#scheme-layer-labels'),
 			  				break;
 
 			  		} 
-			       	nameList = "<li><span class='iconStation' style='background-color:"+colorLine+"'></span>" 
+			       	nameList = "<li data-stationLiId='"+clickedLineArrayShowed[i]['id'] +"'><span class='iconStation' style='background-color:"+colorLine+"'></span>" 
 			       				+ clickedLineArrayShowed[i]['name'] + "<span class='clearStation' data-stationId='"+clickedLineArrayShowed[i]['id'] +"'>&times;</span></li>";
 			       	document.getElementById("listStation").innerHTML += nameList;
 			       	
 			       	if(nameList) {
 			       		clearAll.style.display = "block";
 			       	}
-
-			        elClose.push(document.querySelector("span[data-stationId='"+clickedLineArrayShowed[i]['id'] +"']"));
-					
-				
-					
-					
+		
 			  	}	
 
-			  	for(i=0; i<elClose.length; i++) {
 
+			  	// Delete clicked line
+				let elClose = document.querySelectorAll('.clearStation');    
+			  	for(i=0; i<elClose.length; i++) {
+				
 			  		elClose[i].addEventListener('click', function(event) {
+			  			let elCloseId = event.target.dataset.stationid,
+			  				elCloseParent = document.querySelector('#listStation'),
+			  				elCloseChild = elCloseParent.childNodes,
+			  				elCloseLineParent = document.querySelector("#scheme-layer-labels");
+			  				elCloseLineChild = elCloseLineParent.childNodes;
+			
+			  			for(let i=0; i<elCloseLineChild.length; i++) {
+			  				if(i%2) {
+			  				
+			  					let elCloseLineId = elCloseLineChild[i].id.split('-');
+								elCloseLineId  = elCloseLineId[1];
+								if(elCloseLineId == elCloseId)	{
+								
+									elCloseLineChild[i].removeAttribute("class");
+								}		  				
+			  				}
+			  				
+			  			}
+
+			  			for(let i=0; i<elCloseChild.length;i++) {
+			  				if(elCloseChild[i].attributes[0].value == elCloseId)
+			  				elCloseParent.removeChild(elCloseChild[i]);
+			  			}
+			  				
+			  			//elCloseParent.removeChild();
+			  			for(i=0;i<clickedLineArray.length; i++) {
+						
+			  				if(clickedLineArray[i].id == elCloseId) {
+						        clickedLineArray.splice(i,1);
+						    }
+			  			
+			  			}
 			  			
 			  		})
 			  	
-			  	}	
+			  	} // End cycle for delete clicked line	
+
+				 	
+			}); // End EventListener LineClick
+
+		} // End if % 2
 
 
-						 	
-			});
-
-		}
-
-
-	}
-
-
-
-
+	} // End cycle FOR lines.length 
 
 // When select name line color to red all label
 
 let select = document.querySelector('#line-name'),
-	selectedLineObject = {};
+	selectedLineArrayShowed = [],
+	selectedLineArray = [];
+
 
 select.addEventListener('change', function(event) {
 	let selectedNumberLine = event.target.value,
-		selectedNameLine = event.target.selectedOptions["0"].text;
-
-
-	for(let i=0; i<lines.length; i++) {
-		if(i % 2) {
-			let numberLine = lines[i].getAttribute("data-line");
-			if (selectedNumberLine === numberLine) {
-				lines[i].classList.add("selected");
-				selectedLineObject.id = "";
-				selectedLineObject.name = selectedNameLine;
-				selectedLineObject.line = selectedNumberLine;
-	
-				clickedLineArray.push(selectedLineObject);
-			
-			
-			}
-		}
-	}
-	for (let k = 0; k < selectedLineArrayShowed.length; k++) {
-		if (!selectedLineArrayShowed[k].id) {
-			nameList = "<li><span class='iconStation'></span>" 
-			       	+ selectedLineArrayShowed[k]['name'] + "<span class='clearStation'>&times;</span></li>";
-			document.getElementById("listStation").innerHTML += nameList;
-		}
+		selectedNameLine = event.target.selectedOptions["0"].text,
 		
-	}
-	//selectedLineArray = selectedLineArray;
 
+		lineArea = document.querySelectorAll("#scheme-layer-labels g");
+
+	for(let j=0; j<lineArea.length; j++) {
+		let dataLine = lineArea[j].attributes[1].value,
+			lineName = lineArea[j].childNodes[2].nextSibling.innerHTML;
+			lineId = lineArea[j].id.split('-');
+			lineId = lineId[1];
+		let	selectedLineObject = {};
+		if(selectedNumberLine == dataLine) {
+			// Decorate color selected line
+			lineArea[j].classList.add("selected");
+			// Add to object selected line data
+			selectedLineObject.id = lineId;
+			selectedLineObject.name = lineName;
+			selectedLineObject.line = dataLine;
+			// Push into array selected object
+			selectedLineArray.push(selectedLineObject);
+		}
+	}	
+	
+	// for(let i=0; i<lineArea.length; i++) {
+	// 	if(i % 2) {
+	// 		let numberLine = lines[i].getAttribute("data-line");
+	// 		if (selectedNumberLine === numberLine) {
+	// 			let linesChild = lines[i].childNodes,
+	// 				lineId = lines[i].id.split('-');
+	// 				lineId = lineId[1];
+
+
+	// 			//lines[i].classList.add("selected");
+
+
+	// 			// selectedLineObject.id = lineId;
+	// 			// selectedLineObject.name = linesChild[2].nextSibling.innerHTML;
+	// 			// selectedLineObject.line = selectedNumberLine;
+	
+	// 			// selectedLineArray.push(selectedLineObject);
+			
+	// 		}
+	// 	}
+	// }
+
+	// for (let k = 0; k < selectedLineArrayShowed.length; k++) {
+	// 	if (!selectedLineArrayShowed[k].id) {
+	// 		nameList = "<li><span class='iconStation'></span>" 
+	// 		       	+ selectedLineArrayShowed[k]['name'] + "<span class='clearStation'>&times;</span></li>";
+	// 		document.getElementById("listStation").innerHTML += nameList;
+	// 	}
+		
+	// }
+
+
+	//selectedLineArray = selectedLineArray;
+	
 })
 
 // Event for clear all array station
@@ -188,10 +248,29 @@ clearAll.addEventListener('click', function() {
 	}
 	clickedLineArray = [];
 	clickedLineArrayShowed = [];
+	selectedLineArray = [];
+	selectedLineArrayShowed = [];
 	document.getElementById("listStation").innerHTML = "";
 
 })
 
-console.log(clickedLineArray);
 
+// Send JSON Array
+let clickSend = document.querySelector('.btn__send');
+clickSend.addEventListener('click', function() {
 
+let selectedLinesData = [];
+
+selectedLinesData.push(clickedLineArray);
+selectedLinesData.push(selectedLineArray);
+selectedLinesData.concat(selectedLinesData);
+
+ fetch('http://metro.sem-dev.co.ua/', {
+  method: 'post',
+  headers: {
+    'Accept': 'application/json, text/plain, */*',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(selectedLinesData)})
+  .then(res=>res.json())
+})
