@@ -79,6 +79,7 @@ button:focus {
 }
 .modal-content__right {
 	width: 30%;
+	position: relative;
 }
 
 .close {
@@ -249,4 +250,29 @@ button:focus {
 	font-size: 14px;
 	color: blue;
 	cursor: pointer;
+}
+
+.searchList {
+	display: none;
+	position: absolute;
+	width: 100%;
+	top: 63px;	
+	padding-left: 0;
+	padding: 5px;
+	list-style-type: none;
+	background-color: #eee;
+	border: 1px solid #000;
+}
+
+.searchList li {
+	font-family: Arial, sans-serif;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.8;
+}
+
+.searchList li:hover {
+	cursor: pointer;
+	background-color: #e5e5e5;
+	transition: 0.4s;
 }
