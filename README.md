@@ -1,3 +1,3 @@
-# filterMapMetro
-Map metro SPb with filter
-![Image of Yaktocat] (https://dimanovik.github.io/filterMapMetro/images/project.jpg)
+# Filtered Map Metro
+
+![alt text](https://raw.githubusercontent.com/username/projectname/branch/path/to/img.png)
