@@ -230,6 +230,7 @@ let lineArea = document.querySelector('#scheme-layer-labels'),
 // When select name line color to red all label
 
 let select = document.querySelector('#line-name'),
+
 	selectedLineArrayShowed = [],
 	selectedLineArray = [];
 
@@ -237,9 +238,11 @@ let select = document.querySelector('#line-name'),
 select.addEventListener('change', function(event) {
 	let selectedNumberLine = event.target.value,
 		selectedNameLine = event.target.selectedOptions["0"].text,
-		
-
 		lineArea = document.querySelectorAll("#scheme-layer-labels g");
+
+	for(let i=0; i<select.length; i++) {
+		select[0].removeAttribute('selected');
+	}
 
 	for(let j=0; j<lineArea.length; j++) {
 		let dataLine = lineArea[j].attributes[1].value,
@@ -257,7 +260,7 @@ select.addEventListener('change', function(event) {
 
 			for(let i=0; i<selectedLineArray.length; i++) {
 				if(selectedLineArray[i]['id'] === selectedLineObject.id) {
-					return false;
+					selectedLineArray.splice(i,1);			
 				}
 			}
 			selectedLineArray.push(selectedLineObject);
@@ -328,49 +331,51 @@ select.addEventListener('change', function(event) {
 		
 			  	}	
 				// Delete clicked line
-										let elClose = document.querySelectorAll('.clearStation');    
-									  	for(i=0; i<elClose.length; i++) {
-										
-									  		elClose[i].addEventListener('click', function(event) {
-									  			let elCloseId = event.target.dataset.stationid,
-									  				elCloseParent = document.querySelector('#listSelectStation'),
-									  				elCloseChild = elCloseParent.childNodes,
-									  				elCloseLineParent = document.querySelector("#scheme-layer-labels");
-									  				elCloseLineChild = elCloseLineParent.childNodes;
-													console.log(1);
-									  			for(let i=0; i<elCloseLineChild.length; i++) {
-									  				if(i%2) {
-									  				
-									  					let elCloseLineId = elCloseLineChild[i].id;
-														
-														if(elCloseLineId == elCloseId)	{
-														
-															elCloseLineChild[i].removeAttribute("class");
-														}		  				
-									  				}
-									  				
-									  			}
-
-									  			for(let i=0; i<elCloseChild.length;i++) {
-									  				if(elCloseChild[i].attributes[0].value == elCloseId)
-									  				elCloseParent.removeChild(elCloseChild[i]);
-									  			}
-									  				
-									  			//elCloseParent.removeChild();
-									  			for(i=0;i<selectedLineArray.length; i++) {
+				let elClose = document.querySelectorAll('.clearStation');    
+				for(i=0; i<elClose.length; i++) {
+					elClose[i].addEventListener('click', function(event) {
+						let elCloseId = event.target.dataset.stationid,
+							elCloseParent = document.querySelector('#listSelectStation'),
+							elCloseChild = elCloseParent.childNodes,
+							elCloseLineParent = document.querySelector("#scheme-layer-labels");
+							elCloseLineChild = elCloseLineParent.childNodes;
 												
-									  				if(selectedLineArray[i].id == elCloseId) {
-												        selectedLineArray.splice(i,1);
-												    }
+							for(let i=0; i<elCloseLineChild.length; i++) {
+								if(i%2) {
+									let elCloseLineId = elCloseLineChild[i].id;
+										if(elCloseLineId == elCloseId)	{
+											elCloseLineChild[i].removeAttribute("class");
+										}		  				
+								}
+							}
+
+							for(let i=0; i<elCloseChild.length;i++) {
+								if(elCloseChild[i].attributes[0].value == elCloseId)
+									elCloseParent.removeChild(elCloseChild[i]);
+								}
+									  				
+							//elCloseParent.removeChild();
+							for(i=0;i<selectedLineArray.length; i++) {
+								if(selectedLineArray[i].id == elCloseId) {
+									 selectedLineArray.splice(i,1);
+								}
 									  			
-									  			}
-									  			
-									  		})
+							}
+
+						})
 									  	
-									  	} // End cycle for delete clicked line				  	
+					} // End cycle for delete clicked line				  	
 		}
 	}	
 });
+
+// Refresh selected option.
+let selectChild = select.childNodes;
+select.addEventListener('blur', function(event) {
+	for(let i=0; i<select.length; i++) {
+		select[0].setAttribute('selected', 'selected');
+	}
+})
 
 // Event for clear all array station
 clearAll.addEventListener('click', function() {
