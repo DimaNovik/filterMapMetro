@@ -1,3 +1,3 @@
 # Filtered Map Metro
 
-![alt text](https://raw.githubusercontent.com/username/projectname/branch/path/to/img.png)
+![alt text](https://dimanovik.github.io/filterMapMetro/images/project.jpg)
