@@ -35,11 +35,19 @@ let lineArea = document.querySelector('#scheme-layer-labels'),
 			
 			let lineClick = document.getElementById(lines[i].id),
 				clickedLineObject = {};
+					
 				lineClick.addEventListener('click', function(event) {
-		
-				let eventLineId = event.path[1].id,
+				
+				let eventLineId = event.target.parentNode.attributes[0].value,
 					eventLineName = event.target.textContent,
-					eventLineNumber = event.path[1].attributes[1].value;
+					eventLineNumber = event.target.parentNode.attributes[1].value,
+						elCloseParent = document.querySelector('#listStation'),
+			  			elCloseChild = elCloseParent.childNodes,
+			  			elCloseSelectedParent = document.querySelector('#listSelectStation'),
+			  			elCloseSelectedChild = elCloseSelectedParent.childNodes,
+			  			elCloseLineParent = document.querySelector("#scheme-layer-labels"),
+			  			elCloseLineChild = elCloseLineParent.childNodes;
+			  			
 
 				lineClick.classList.add("selected");
 
@@ -55,12 +63,61 @@ let lineArea = document.querySelector('#scheme-layer-labels'),
 
 				for(let i=0;i<clickedLineArray.length; i++) {
 					if(clickedLineObject.id == clickedLineArray[i]['id']) {
+						for(let j=0; j<elCloseLineChild.length; j++) {
+			  				if(j%2) {
+			  				
+			  					let elCloseLineId = elCloseLineChild[j].id;
+								
+								if(elCloseLineId == eventLineId)	{
+									elCloseLineChild[j].removeAttribute("class");
+									
+								}		  				
+			  				}
+			  				
+			  			}
+			  			clickedLineArray.splice(i,1);
+			  			for(k=0; k<elCloseChild.length; k++) {
+			  				if(elCloseChild[k].getAttribute('data-stationLiId') == eventLineId) {
+			  					elCloseChild[k].remove();
+			  				}
+			  				
+			  			}
+			  			
+			  			
 						return false;
 					}					
 				}
-			
+
+				// Delete from selectedArray when click on map
+					for(let i=0;i<selectedLineArray.length; i++) {
+					if(clickedLineObject.id == selectedLineArray[i]['id']) {
+						for(let j=0; j<elCloseLineChild.length; j++) {
+			  				if(j%2) {
+			  				
+			  					let elCloseLineId = elCloseLineChild[j].id;
+								
+								if(elCloseLineId == eventLineId)	{
+									elCloseLineChild[j].removeAttribute("class");
+									
+								}		  				
+			  				}
+			  				
+			  			}
+			  			selectedLineArray.splice(i,1);
+			  			for(k=0; k<elCloseSelectedChild.length; k++) {
+
+			  				if(elCloseSelectedChild[k].getAttribute('data-stationLiId') == eventLineId) {
+			  					elCloseSelectedChild[k].remove();
+			  				}
+			  				
+			  			}
+			  			
+			  			
+						return false;
+					}					
+				}	
+
 				clickedLineArray.push(clickedLineObject);
-				
 				//console.log(clickedLineArray);
 
 
@@ -69,7 +126,8 @@ let lineArea = document.querySelector('#scheme-layer-labels'),
     				return self.indexOf(value) === index;
 				}
 				clickedLineArray.filter( uniqueVal);
-			
+
+
 				clickedLineArrayShowed = clickedLineArray;
 
 				// функция для сортировки в прямом порядке (по возрастанию)
@@ -116,7 +174,8 @@ let lineArea = document.querySelector('#scheme-layer-labels'),
 			       	}
 		
 			  	}	
-
+			  	//elCloseParent.removeChild();
+									  	
 
 			  	// Delete clicked line
 				let elClose = document.querySelectorAll('.clearStation');    
@@ -191,20 +250,38 @@ select.addEventListener('change', function(event) {
 		if(selectedNumberLine == dataLine) {
 			// Decorate color selected line
 			lineArea[j].classList.add("selected");
-			// Add to object selected line data
+
 			selectedLineObject.id = lineId;
 			selectedLineObject.name = lineName;
 			selectedLineObject.line = dataLine;
-			// Push into array selected object
-			selectedLineArray.push(selectedLineObject);
 
-			// function for insert unique data for array
-				function uniqueVal(value, index, self) { 
-    				return self.indexOf(value) === index;
+			for(let i=0; i<selectedLineArray.length; i++) {
+				if(selectedLineArray[i]['id'] === selectedLineObject.id) {
+					return false;
 				}
-				clickedLineArray.filter( uniqueVal);
+			}
+			selectedLineArray.push(selectedLineObject);
+			// Push into array selected object
 			
-				clickedLineArrayShowed = selectedLineArray;
+			// function for insert unique data for array
+			function uniqueVal(value, index, self) { 
+    			return self.indexOf(value) === index;
+			}
+			selectedLineArray.filter(uniqueVal);
+			
+
+
+			for(let i=0; i<clickedLineArray.length; i++) {
+				for(let k=0; k<selectedLineArray.length; k++) {
+					if(clickedLineArray[i]['id'] === selectedLineArray[k]['id']) {
+						selectedLineArray.splice(k,1);
+					}
+
+				}
+
+			}	
+
+				selectedLineArrayShowed = selectedLineArray;
 
 				// функция для сортировки в прямом порядке (по возрастанию)
 				function compareObjects (a, b) {
@@ -212,14 +289,14 @@ select.addEventListener('change', function(event) {
   				if (a.line < b.line) return -1;
   				return 0;
 				};		
-				clickedLineArrayShowed.sort(compareObjects);
+				selectedLineArrayShowed.sort(compareObjects);
 				
 				
 		
 				// add selected station in ul list
-				document.getElementById("listStation").innerHTML = "";
+				document.getElementById("listSelectStation").innerHTML = "";
 				
-				for (let i = 0; i < clickedLineArrayShowed.length; i++)
+				for (let i = 0; i < selectedLineArrayShowed.length; i++)
 			  	{
 			  		// checked line number to create background color for li
 			  		let colorLine = "";
@@ -241,9 +318,9 @@ select.addEventListener('change', function(event) {
 			  				break;
 
 			  		} 
-			       	nameList = "<li data-stationLiId='"+clickedLineArrayShowed[i]['id'] +"'><span class='iconStation' style='background-color:"+colorLine+"'></span>" 
-			       				+ clickedLineArrayShowed[i]['name'] + "<span class='clearStation' data-stationId='"+clickedLineArrayShowed[i]['id'] +"'>&times;</span></li>";
-			       	document.getElementById("listStation").innerHTML += nameList;
+			       	nameList = "<li data-stationLiId='"+selectedLineArrayShowed[i]['id'] +"'><span class='iconStation' style='background-color:"+colorLine+"'></span>" 
+			       				+ selectedLineArrayShowed[i]['name'] + "<span class='clearStation' data-stationId='"+selectedLineArrayShowed[i]['id'] +"'>&times;</span></li>";
+			       	document.getElementById("listSelectStation").innerHTML += nameList;
 			       	
 			       	if(nameList) {
 			       		clearAll.style.display = "block";
@@ -256,11 +333,11 @@ select.addEventListener('change', function(event) {
 										
 									  		elClose[i].addEventListener('click', function(event) {
 									  			let elCloseId = event.target.dataset.stationid,
-									  				elCloseParent = document.querySelector('#listStation'),
+									  				elCloseParent = document.querySelector('#listSelectStation'),
 									  				elCloseChild = elCloseParent.childNodes,
 									  				elCloseLineParent = document.querySelector("#scheme-layer-labels");
 									  				elCloseLineChild = elCloseLineParent.childNodes;
-									
+													console.log(1);
 									  			for(let i=0; i<elCloseLineChild.length; i++) {
 									  				if(i%2) {
 									  				
@@ -311,6 +388,7 @@ clearAll.addEventListener('click', function() {
 	selectedLineArray = [];
 	selectedLineArrayShowed = [];
 	document.getElementById("listStation").innerHTML = "";
+	document.getElementById("listSelectStation").innerHTML = "";
 
 });
 
@@ -321,7 +399,7 @@ search.addEventListener('keyup', function(event) {
 	let inputValue = event.target.value;
 	const xmlhttp = new XMLHttpRequest();
 	let url = "stations.json";
-
+	console.log(1);
 	if(inputValue.length <= 3) {
 		document.querySelector('#searchList').style.display = "none";
 	}
@@ -489,7 +567,6 @@ search.addEventListener('click', function() {
 });
 
 
-console.log(selectedLineArray);
 // Send JSON Array
 let clickSend = document.querySelector('.btn__send');
 clickSend.addEventListener('click', function() {
